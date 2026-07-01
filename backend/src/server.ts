@@ -2,21 +2,24 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Importação das rotas organizadas por domínio
+// Importação dos módulos de rotas (cada arquivo gerencia um recurso do sistema)
 import { userRoutes } from "./routes/user.routes";
 import { subjectRoutes } from "./routes/subject.routes";
 import { taskRoutes } from "./routes/task.routes";
+import { documentRoutes } from "./routes/document.routes";
+import { opportunityRoutes } from "./routes/opportunity.routes";
 
-// Carrega as variáveis de ambiente do arquivo .env para process.env
+// Carrega variáveis de ambiente (como portas, chaves secretas ou URLs de banco)
 dotenv.config();
 
 const app = express();
 
-// Middlewares: configuram como o servidor processa as requisições
-app.use(cors());        // Habilita o CORS (permite que o frontend acesse o backend de domínios diferentes)
-app.use(express.json()); // Permite que a API entenda e interprete requisições com corpo em JSON
+// Middlewares: processam a requisição antes de chegar na lógica das rotas
+app.use(cors());        // Habilita o CORS para permitir acesso de diferentes origens (ex: seu frontend)
+app.use(express.json()); // Permite que o servidor entenda JSON no corpo das requisições (POST/PATCH)
 
-// Rota de monitoramento (Health Check): usada para saber se o servidor está no ar
+// Rota de monitoramento (Health Check)
+// Ideal para serviços de deploy (como Render ou Railway) saberem que o servidor está vivo
 app.get("/health", (req, res) => {
   return res.json({
     status: "ok",
@@ -24,15 +27,17 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Registro das rotas na aplicação
-app.use(userRoutes);    // Rotas de Usuário
-app.use(subjectRoutes); // Rotas de Disciplinas
-app.use(taskRoutes);    // Rotas de Tarefas
+// Registro de todas as rotas da aplicação
+app.use(userRoutes);
+app.use(subjectRoutes);
+app.use(taskRoutes);
+app.use(documentRoutes);
+app.use(opportunityRoutes);
 
-// Define a porta: usa a porta definida no .env ou assume 3333 como padrão
+// Define a porta do servidor, priorizando a variável de ambiente PORT ou 3333 por padrão
 const PORT = process.env.PORT || 3333;
 
-// Inicializa o servidor e o coloca para "ouvir" as requisições na porta definida
+// Inicializa o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
